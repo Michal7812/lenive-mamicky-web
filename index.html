@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <title>Recepty z chladničky pre lenivé mamičky 😁</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #f0f0f0;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>👩‍🍳 Recepty z chladničky pre lenivé mamičky 😁</h1>
+  <p>Zadaj suroviny oddelené čiarkou:</p>
+  <textarea id="ingredients" placeholder="napr. cibuľa, cestoviny, cesnak, syr..."></textarea>
+  <br>
+  <button onclick="generate()">Generovať recepty</button>
+  <pre id="result">Sem sa vypíšu tvoje recepty...</pre>
+
+  <script>
+    async function generate() {
+      const ingredients = document.getElementById('ingredients').value
+        .split(',')
+        .map(i => i.trim());
+      
+      const response = await fetch("https://us-central1-lenive-mamicky.cloudfunctions.net/generateRecipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ingredients })
+      });
+
+      const data = await response.json();
+      document.getElementById('result').textContent = data.result || "Nič sa nevrátilo.";
+    }
+  </script>
+</body>
+</html>
