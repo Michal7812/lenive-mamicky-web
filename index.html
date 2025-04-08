@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Recepty z chladničky pre lenivé mamičky 😁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: sans-serif;
@@ -16,14 +17,26 @@
       margin-bottom: 1rem;
     }
     button {
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1.5rem;
       font-size: 1rem;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
     }
     pre {
       white-space: pre-wrap;
       background: #f0f0f0;
       padding: 1rem;
       margin-top: 1rem;
+      border-radius: 5px;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      button {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
     }
   </style>
 </head>
@@ -33,15 +46,15 @@
   <textarea id="ingredients" placeholder="napr. cibuľa, cestoviny, cesnak, syr..."></textarea>
   <br>
   <button onclick="generate()">Generovať recepty</button>
+  <button onclick="downloadPDF()">📄 Stiahnuť ako PDF</button>
   <pre id="result">Sem sa vypíšu tvoje recepty...</pre>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     async function generate() {
       const ingredients = document.getElementById('ingredients').value
         .split(',')
         .map(i => i.trim());
-
-      console.log("Zadane suroviny:", ingredients);
 
       try {
         const response = await fetch("https://us-central1-lenive-mamicky.cloudfunctions.net/generateRecipe", {
@@ -53,12 +66,21 @@
         });
 
         const data = await response.json();
-        console.log("Odpoved:", data);
         document.getElementById('result').textContent = data.result || "Nič sa nevrátilo.";
       } catch (error) {
         console.error("Chyba pri volaní funkcie:", error);
         document.getElementById('result').textContent = "Chyba pri spojení s AI funkciou.";
       }
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const text = document.getElementById("result").textContent;
+
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 10, 10);
+      doc.save("recepty.pdf");
     }
   </script>
 </body>
